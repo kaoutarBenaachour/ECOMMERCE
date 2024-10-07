@@ -3,6 +3,10 @@ from flask import Blueprint, app, jsonify, render_template, request
 from app.database.database import get_connection
 from app.service.deleteproduct import deleteproduct  # Corrected path to deleteproduct function
 main = Blueprint('main', __name__) 
+from app.service.addProduct import add_product  # Corrected path to addproduct function
+
+
+main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
@@ -53,3 +57,10 @@ def login():
         else:
             return jsonify({"message": "Mot de passe incorrect!"}), 401
     return jsonify({"message": "Utilisateur non trouvé!"}), 404
+    return jsonify({"message": result})  # Return the result as a JSON response
+
+# Route for adding a product
+@main.route('/add_product/<int:id>', methods=['ADD'])
+def add_product_route(id):
+    result = add_product(id) 
+    return jsonify({"message": result})  
