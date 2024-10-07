@@ -1,23 +1,341 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Produits</title>
-    <link rel="stylesheet" >
+    <title>Gestion de Produits</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Liste des Produits</h1>
-    <ul>
-        {% for produit in produits %}
-            <li>
-                <strong>{{ produit.nom }}</strong><br>
-                Description: {{ produit.description }}<br>
-                Prix: {{ produit.prix }} €<br>
-                Quantité: {{ produit.quantite }}
-            </li>
-            <hr>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>Gestion de Produits</h1>
+        
+        <!-- Section d'authentification -->
+        <div id="authSection">
+            <h2>Authentification</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mot de passe:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p>Pas de compte ? <a href="#" id="showRegister">S'inscrire</a></p>
+        </div>
+
+        <!-- Section d'inscription -->
+        <div id="registerSection" class="hidden">
+            <h2>Inscription</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerNom">Nom:</label>
+                    <input type="text" id="registerNom" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPrenom">Prénom:</label>
+                    <input type="text" id="registerPrenom" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Mot de passe:</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerNumTele">Numéro de téléphone:</label>
+                    <input type="text" id="registerNumTele" required>
+                </div>
+                <button type="submit">S'inscrire</button>
+            </form>
+            <p>Déjà un compte ? <a href="#" id="showLogin">Se connecter</a></p>
+        </div>
+
+        <!-- Section de gestion des produits -->
+        <div id="productSection" class="hidden">
+            <h2>Liste des Produits</h2>
+            <button id="showAddProductForm">Ajouter un nouveau produit</button>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Quantité</th>
+                        <th>Description</th>
+                        <th>Prix</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les produits seront ajoutés ici dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulaire pour ajouter/modifier un produit -->
+        <div id="productFormSection" class="hidden">
+            <h2 id="productFormTitle">Ajouter un Produit</h2>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label for="nom">Nom:</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantite">Quantité:</label>
+                    <input type="number" id="quantite" name="quantite" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description" required>
+                </div>
+                <div class="form-group">
+                    <label for="prix">Prix:</label>
+                    <input type="number" id="prix" name="prix" step="0.01" required>
+                </div>
+                <button type="submit">Sauvegarder</button>
+                <button type="button" id="cancelProductForm">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Éléments DOM
+        const authSection = document.getElementById('authSection');
+        const registerSection = document.getElementById('registerSection');
+        const productSection = document.getElementById('productSection');
+        const productFormSection = document.getElementById('productFormSection');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const productTable = document.getElementById('productTable');
+        const productForm = document.getElementById('productForm');
+        const showAddProductFormBtn = document.getElementById('showAddProductForm');
+        const showRegisterLink = document.getElementById('showRegister');
+        const showLoginLink = document.getElementById('showLogin');
+        const cancelProductFormBtn = document.getElementById('cancelProductForm');
+
+        // Fonctions pour afficher/cacher les sections
+        function showSection(section) {
+            authSection.classList.add('hidden');
+            registerSection.classList.add('hidden');
+            productSection.classList.add('hidden');
+            productFormSection.classList.add('hidden');
+            section.classList.remove('hidden');
+        }
+
+        showRegisterLink.addEventListener('click', () => showSection(registerSection));
+        showLoginLink.addEventListener('click', () => showSection(authSection));
+        showAddProductFormBtn.addEventListener('click', () => {
+            document.getElementById('productFormTitle').textContent = 'Ajouter un Produit';
+            productForm.reset();
+            document.getElementById('productId').value = '';
+            showSection(productFormSection);
+        });
+        cancelProductFormBtn.addEventListener('click', () => showSection(productSection));
+
+        // Gestion de la connexion
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mail: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value
+                    }),
+                });
+                const data = await response.json();
+                alert(data.message);
+                if (response.ok) {
+                    showSection(productSection);
+                    loadProducts();
+                }
+            } catch (error) {
+                alert('Erreur de connexion: ' + error);
+            }
+        });
+
+        // Gestion de l'inscription
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nom: document.getElementById('registerNom').value,
+                        prenom: document.getElementById('registerPrenom').value,
+                        mail: document.getElementById('registerEmail').value,
+                        password: document.getElementById('registerPassword').value,
+                        numTele: document.getElementById('registerNumTele').value
+                    }),
+                });
+                const data = await response.json();
+                alert(data.message);
+                showSection(authSection);
+            } catch (error) {
+                alert('Erreur d\'inscription: ' + error);
+            }
+        });
+
+        // Charger les produits
+        async function loadProducts() {
+            try {
+                const response = await fetch('/produits');
+                const products = await response.json();
+                const tbody = productTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                products.forEach(product => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${product.nom}</td>
+                        <td>${product.quantite}</td>
+                        <td>${product.description}</td>
+                        <td>${product.prix}</td>
+                        <td>
+                            <button onclick="modifyProduct(${product.id})">Modifier</button>
+                            <button onclick="deleteProduct(${product.id})">Supprimer</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Erreur lors du chargement des produits:', error);
+            }
+        }
+
+        // Modifier un produit
+        async function modifyProduct(id) {
+            try {
+                const response = await fetch(`/produit/${id}`);
+                const product = await response.json();
+                document.getElementById('productFormTitle').textContent = 'Modifier le Produit';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('nom').value = product.nom;
+                document.getElementById('quantite').value = product.quantite;
+                document.getElementById('description').value = product.description;
+                document.getElementById('prix').value = product.prix;
+                showSection(productFormSection);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Supprimer un produit
+        async function deleteProduct(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                try {
+                    const response = await fetch(`/delete_product/${id}`, { method: 'DELETE' });
+                    const data = await response.json();
+                    alert(data.message);
+                    loadProducts();
+                } catch (error) {
+                    alert('Erreur lors de la suppression: ' + error);
+                }
+            }
+        }
+
+        // Gérer la soumission du formulaire de produit (ajout/modification)
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productData = {
+                id: document.getElementById('productId').value,
+                nom: document.getElementById('nom').value,
+                quantite: document.getElementById('quantite').value,
+                description: document.getElementById('description').value,
+                prix: document.getElementById('prix').value
+            };
+
+            try {
+                const url = productData.id ? '/modify_product' : '/add_product';
+                const method = productData.id ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                });
+                const data = await response.json();
+                alert(data.message);
+                showSection(productSection);
+                loadProducts();
+            } catch (error) {
+                alert('Erreur lors de l\'opération: ' + error);
+            }
+        });
+
+        // Configuration initiale
+        showSection(authSection);
+    </script>
 </body>
 </html>

@@ -111,3 +111,34 @@ def add_product_route():
     prix = data['prix']
     result = add_product(nom, quantite, description, prix)  # Pass all required parameters
     return jsonify({"message": result}) 
+
+@main.route('/produit/<int:id>', methods=['GET'])
+def get_product(id):
+    print(f"Tentative de récupération du produit avec l'ID: {id}")
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT * FROM produit WHERE id = %s", (id,))
+        product = cursor.fetchone()
+        
+        if product:
+            print(f"Produit récupéré de la base de données: {product}")
+            product_data = {
+                'nom': product[0],
+                'quantite': product[1],
+                'description': product[2],
+                'prix': product[3],
+                'id': product[4],
+            }
+            print(f"Données du produit formatées pour l'envoi: {product_data}")
+            return jsonify(product_data)
+        else:
+            print(f"Aucun produit trouvé avec l'ID: {id}")
+            return jsonify({"message": "Produit non trouvé"}), 404
+    except Exception as e:
+        print(f"Erreur lors de la récupération du produit: {str(e)}")
+        return jsonify({"message": "Erreur lors de la récupération du produit"}), 500
+    finally:
+        cursor.close()
+        conn.close()
