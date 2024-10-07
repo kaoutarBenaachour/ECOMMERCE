@@ -1,5 +1,5 @@
-from database.database import get_connection  # Import the get_connection function
-from model.produit import Produit  # Import the Produit class
+from ..database.database import get_connection
+from ..model.produit import Produit  # Import the Produit class
 import mysql.connector  # Import mysql.connector for error handling
 
 class ProductService:
@@ -34,31 +34,3 @@ class ProductService:
         finally:
             cursor.close()  # Close the cursor
             connection.close()  # Close the connection
-
-# Testing the modify_product function
-if __name__ == "__main__":
-    print("Starting the product modification script...")  # Debugging statement
-    service = ProductService()
-
-    # Create a Produit instance with the ID of the product you want to modify
-    product_to_modify = Produit(id=3, nom="Updated Test Product", quantite=10, description="Updated description", prix=75)
-
-    # Call the modify_product method to update the product
-    service.modify_product(product_to_modify)
-
-    # Verify changes by querying the database
-    connection = get_connection()
-    cursor = connection.cursor()
-    
-    # Fetch the updated product details
-    cursor.execute("SELECT * FROM produit WHERE id = %s", (product_to_modify.id,))
-    result = cursor.fetchone()
-
-    if result:
-        print("Updated Product Details:")
-        print(f"ID: {result[4]}, Name: {result[0]}, Quantity: {result[1]}, Description: {result[2]}, Price: {result[3]}")
-    else:
-        print(f"Product with ID {product_to_modify.id} not found after update.")
-
-    cursor.close()  # Close the cursor
-    connection.close()  # Close the connection
