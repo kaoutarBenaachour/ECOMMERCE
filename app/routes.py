@@ -30,7 +30,36 @@ def liste_produits():
 @main.route('/delete_product/<int:id>', methods=['DELETE'])
 def delete_product_route(id):
     result = deleteproduct(id)  # Call the deleteproduct function with the product ID
-    return jsonify({"message": result})  # Return the result as a JSON response
+    return jsonify({"message": result})  
+
+
+# Route for modifying a product
+@main.route('/modify_product', methods=['PUT'])  # Change POST to PUT if you are modifying an existing product
+def modify_product():
+    data = request.get_json()  # Get the JSON data from the request
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    # Extract product details from the request
+    try:
+        product_id = data['id']
+        nom = data['nom']
+        quantite = data['quantite']
+        description = data['description']
+        prix = data['prix']
+    except KeyError as e:
+        return jsonify({"error": f"Missing key: {str(e)}"}), 400
+    
+    # Create an instance of Produit
+    product_to_modify = Produit(id=product_id, nom=nom, quantite=quantite, description=description, prix=prix)
+
+    # Call the modify_product method
+    service = ProductService()
+    service.modify_product(product_to_modify)
+
+    return jsonify({"message": "Product updated successfully"}), 200
+
+
 
 
 # Route for modifying a product
