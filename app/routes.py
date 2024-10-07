@@ -25,7 +25,7 @@ def liste_produits():
 @main.route('/delete_product/<int:id>', methods=['DELETE'])
 def delete_product_route(id):
     result = deleteproduct(id)  # Call the deleteproduct function with the product ID
-    return jsonify({"message": result})  # Return the result as a JSON response
+    return jsonify({"message": result})  
 
 @main.route('/register', methods=['POST'])
 def register():
