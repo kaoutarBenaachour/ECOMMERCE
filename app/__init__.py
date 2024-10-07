@@ -1,9 +1,21 @@
+# from flask import Flask
+
+# def create_app():
+#     app = Flask(__name__)
+#     app.config.from_object('config.Config')
+
+#     from .routes import main
+#     app.register_blueprint(main)
+
+#     return app
+
+
 from flask import Flask
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config.Config')
 
+    # Importez les routes ici
     from .routes import main
     app.register_blueprint(main)
 
