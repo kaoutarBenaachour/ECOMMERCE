@@ -1,4 +1,4 @@
-from ..database.database import get_connection
+from app.database.database import get_connection
 
 def add_product(nom, quantite, description, prix):
     try:

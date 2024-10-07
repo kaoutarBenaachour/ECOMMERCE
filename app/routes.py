@@ -1,4 +1,7 @@
 from app.service.modifyProd import ProductService
+from flask import Blueprint, render_template, jsonify
+
+from app.service.findAllProducts import get_all_produits  # Chemin vers la fonction pour récupérer les produits
 import bcrypt
 from flask import Blueprint, app, jsonify, render_template, request
 from app.database.database import get_connection
@@ -16,6 +19,12 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def index():
     return render_template('index.html')
+
+
+@main.route('/produits', methods=['GET'])
+def liste_produits():
+    produits = get_all_produits()  # Récupère tous les produits
+    return jsonify(produits)  # Retourne les produits au format JSON
 
 # Route for deleting a product
 @main.route('/delete_product/<int:id>', methods=['DELETE'])
@@ -93,8 +102,12 @@ def login():
     return jsonify({"message": "Utilisateur non trouvé!"}), 404
     return jsonify({"message": result})  # Return the result as a JSON response
 
-# Route for adding a product
-@main.route('/add_product/<int:id>', methods=['ADD'])
-def add_product_route(id):
-    result = add_product(id) 
-    return jsonify({"message": result})  
+@main.route('/add_product', methods=['POST'])  # Change 'ADD' to 'POST'
+def add_product_route():
+    data = request.get_json()  # Get the JSON data from the request
+    nom = data['nom']
+    quantite = data['quantite']
+    description = data['description']
+    prix = data['prix']
+    result = add_product(nom, quantite, description, prix)  # Pass all required parameters
+    return jsonify({"message": result}) 
