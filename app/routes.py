@@ -16,11 +16,10 @@ def index():
     return render_template('index.html')
 
 
-# Route for listing all products
 @main.route('/produits', methods=['GET'])
 def liste_produits():
     produits = get_all_produits()  # Récupère tous les produits
-    return render_template('index.html', produits=produits)  # Retourne le template avec la liste des produits
+    return jsonify(produits)  # Retourne les produits au format JSON
 
 # Route for deleting a product
 @main.route('/delete_product/<int:id>', methods=['DELETE'])
@@ -69,8 +68,12 @@ def login():
     return jsonify({"message": "Utilisateur non trouvé!"}), 404
     return jsonify({"message": result})  # Return the result as a JSON response
 
-# Route for adding a product
-@main.route('/add_product/<int:id>', methods=['ADD'])
-def add_product_route(id):
-    result = add_product(id) 
-    return jsonify({"message": result})  
+@main.route('/add_product', methods=['POST'])  # Change 'ADD' to 'POST'
+def add_product_route():
+    data = request.get_json()  # Get the JSON data from the request
+    nom = data['nom']
+    quantite = data['quantite']
+    description = data['description']
+    prix = data['prix']
+    result = add_product(nom, quantite, description, prix)  # Pass all required parameters
+    return jsonify({"message": result}) 
