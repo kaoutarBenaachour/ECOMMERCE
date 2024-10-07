@@ -16,11 +16,10 @@ def index():
     return render_template('index.html')
 
 
-# Route for listing all products
 @main.route('/produits', methods=['GET'])
 def liste_produits():
     produits = get_all_produits()  # Récupère tous les produits
-    return render_template('index.html', produits=produits)  # Retourne le template avec la liste des produits
+    return jsonify(produits)  # Retourne les produits au format JSON
 
 # Route for deleting a product
 @main.route('/delete_product/<int:id>', methods=['DELETE'])
