@@ -1,4 +1,5 @@
-from app.database.database import get_connection # Assurez-vous que le chemin est correct
+from app.database.database import get_connection
+from app.model.produit import Produit # Assurez-vous que le chemin est correct
 
 def get_all_produits():
     db = get_connection()  # Connexion à la base de données
